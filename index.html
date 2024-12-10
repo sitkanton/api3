@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мультимедиа и Графика</title>
+</head>
+<body>
+
+<h2>Аудио и Видео</h2>
+
+
+<audio id="audioPlayer" controls>
+    <source src="audio-file.mp3" type="audio/mp3">
+    Ваш браузер не поддерживает аудио.
+</audio>
+<button onclick="toggleAudio()">Воспроизведение/Пауза</button>
+<input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onchange="changeVolume()">
+<label for="volumeControl">Громкость</label>
+
+<br><br>
+
+<video id="videoPlayer" width="400" controls>
+    <source src="video-file.mp4" type="video/mp4">
+    Ваш браузер не поддерживает видео.
+</video>
+<button onclick="toggleVideo()">Воспроизведение/Пауза</button>
+<input type="range" id="videoVolumeControl" min="0" max="1" step="0.1" value="1" onchange="changeVideoVolume()">
+<label for="videoVolumeControl">Громкость</label>
+
+<br><br>
+
+<h2>Графика и Анимация</h2>
+
+<canvas id="myCanvas" width="500" height="500"></canvas>
+
+<br><br>
+
+<h2>Работа с Изображениями</h2>
+
+<input type="file" id="imageInput" accept="image/*">
+<canvas id="imageCanvas" width="500" height="500"></canvas>
+<button onclick="saveImage()">Сохранить изображение</button>
+
+<script>
+  
+    const audioPlayer = document.getElementById('audioPlayer');
+    function toggleAudio() {
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+        } else {
+            audioPlayer.pause();
+        }
+    }
+
+    function changeVolume() {
+        audioPlayer.volume = document.getElementById('volumeControl').value;
+    }
+
+    
+    const videoPlayer = document.getElementById('videoPlayer');
+    function toggleVideo() {
+        if (videoPlayer.paused) {
+            videoPlayer.play();
+        } else {
+            videoPlayer.pause();
+        }
+    }
+
+    function changeVideoVolume() {
+        videoPlayer.volume = document.getElementById('videoVolumeControl').value;
+    }
+
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+    let x = 50, y = 50, dx = 2, dy = 2;
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);  
+        ctx.fillStyle = "#0095DD";
+        ctx.fillRect(x, y, 50, 50);
+
+        if (x + dx > canvas.width - 50 || x + dx < 0) {
+            dx = -dx;
+        }
+        if (y + dy > canvas.height - 50 || y + dy < 0) {
+            dy = -dy;
+        }
+
+        x += dx;
+        y += dy;
+
+        requestAnimationFrame(draw); 
+    }
+
+    draw(); 
+
+    
+    const imageInput = document.getElementById('imageInput');
+    const imageCanvas = document.getElementById('imageCanvas');
+    const ctxImage = imageCanvas.getContext('2d');
+
+    imageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const img = new Image();
+            img.src = e.target.result;
+
+            img.onload = function() {
+                ctxImage.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+                ctxImage.drawImage(img, 0, 0, imageCanvas.width, imageCanvas.height); 
+                applyFilter(); 
+            };
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+    function applyFilter() {
+        ctxImage.filter = 'grayscale(100%)';
+        ctxImage.drawImage(imageCanvas, 0, 0);  
+    }
+
+    
+    function saveImage() {
+        const link = document.createElement('a');
+        link.download = 'canvas-image.png';
+        link.href = imageCanvas.toDataURL();  
+        link.click();
+    }
+</script>
+
+</body>
+</html>
